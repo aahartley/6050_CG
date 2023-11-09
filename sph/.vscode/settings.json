@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "Matrix.C": "cpp",
+        "StarterViewer.C": "cpp",
+        "LinearAlgebra.C": "cpp",
+        "simple_viewer.C": "cpp",
+        "main.C": "cpp",
+        "Window.C": "cpp",
+        "sstream": "cpp",
+        "cstring": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "Geometry.C": "cpp",
+        "SPHSolver.C": "cpp",
+        "cmath": "cpp",
+        "random": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}
