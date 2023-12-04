@@ -28,8 +28,8 @@ int projection = 0;
 int obj = 0;
 
 float fov = 50;
-float worldZ = -30.f
-;
+float worldZ = -30.f;
+
 float scaleX = 1;
 float scaleY = 1;
 float scaleZ = 1;
@@ -68,11 +68,15 @@ void initWindow()
 	{
 		if (ratio >= 1)
 		{
-			gluOrtho2D(-100 * ratio , 100 * ratio, -100, 100);
+			//gluOrtho2D(-100 * ratio , 100 * ratio, -100, 100);
+			glOrtho(-100 * ratio , 100 * ratio, -100, 100, -100, 100);//so movement in Z doesnt lose object
+
 		}
 		else
 		{
-			gluOrtho2D(-100, 100, -100 / ratio, 100 / ratio);
+			//gluOrtho2D(-100, 100, -100 / ratio, 100 / ratio);
+			glOrtho(-100 , 100 , -100 / ratio, 100 / ratio, -100, 100);//so movement in Z doesnt lose object
+
 		}
 	}
     glMatrixMode( GL_MODELVIEW );
@@ -107,19 +111,20 @@ void display(void)
 	glLoadIdentity();
 	gluLookAt(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
 
+	//scale * rotate * translate
 	glPushMatrix();
-	glTranslatef(transX, transY, transZ);
+	glTranslatef(transX, transY, transZ); //user
     glTranslatef( 0.f, 0.f, worldZ ); // move to world coords [-100,100] for xyz based on projection
-	glRotatef(thetaX, 1, 0, 0);
-	glRotatef(thetaY, 0, 1, 0);
-	glRotatef(thetaZ, 0, 0, 1);
-	glScalef(scaleX, scaleY, scaleZ);
+	glRotatef(thetaX, 1, 0, 0); //user
+	glRotatef(thetaY, 0, 1, 0); //user
+	glRotatef(thetaZ, 0, 0, 1); //user
+	glScalef(scaleX, scaleY, scaleZ); //user
 	glScalef(10,10,10); // scale to world
-	if(obj == 0) drawCube();
+	if(obj == 0) drawCube(1);
 	else if(obj == 1) drawSphere(1, 20, 20); //slices/stacks low in so you can see the sphere move better
 	else if(obj == 2) drawCylinder(1, 1);
 	else if(obj == 3) drawCone(1, 1);
-
+	else if(obj == 4) drawTorus(10, 20);
 	glPopMatrix();
 
 	glutSwapBuffers();                                      // Draw Frame Buffer 
@@ -143,11 +148,15 @@ void reshape( int w, int h )
 	{
 		if (ratio >= 1)
 		{
-			gluOrtho2D(-100 * ratio , 100 * ratio, -100, 100);
+			//gluOrtho2D(-100 * ratio , 100 * ratio, -100, 100);
+			glOrtho(-100 * ratio , 100 * ratio, -100, 100, -100, 100); //so movement in Z doesnt lose object
+
 		}
 		else
 		{
-			gluOrtho2D(-100, 100, -100 / ratio, 100 / ratio);
+			//gluOrtho2D(-100, 100, -100 / ratio, 100 / ratio);
+			glOrtho(-100 , 100 , -100 / ratio, 100 / ratio, -100, 100);//so movement in Z doesnt lose object
+
 		}
 	}
 
@@ -243,6 +252,9 @@ void keyboard(unsigned char key, int x, int y)
 	case 'n':
 		obj = 3;
 		break;		
+	case 'm':
+		obj = 4;
+		break;	
 	case '+':
 		transZ += 1;
 		break;

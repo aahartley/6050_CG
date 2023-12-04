@@ -116,8 +116,7 @@ void Window::Display()
 
    for(int i = 0; i < solver->GetNum(); i++)
    {
-      
-      gl::drawCircle(solver->GetParticles()[i].GetPos(), solver->GetParticles()[i].GetSize()/2);
+      gl::drawCircle(solver->GetParticles()[i].GetPos(), solver->GetParticles()[i].GetRadius()* SCALE);
    }
 
 
@@ -153,6 +152,12 @@ void Window::Keyboard( unsigned char key, int x, int y )
         break;
       case 'u':
 	     Usage();
+      case 'd':
+         solver->GetUserF().X() += 10;
+         break;
+      case 'a':
+         solver->GetUserF().X() -= 10;
+         break; 
       break;
    }
 }
@@ -187,7 +192,7 @@ void Window::Idle()
 {
    solver->PerformSimulation();
    glutPostRedisplay();
-   glutTimerFunc(1000/fps, &cbTimerFunc, 0);
+   glutTimerFunc(1000/fps, &cbTimerFunc, 0); //(1/solver->GetDT())
 
 }
 

@@ -12,6 +12,8 @@ public:
 
     float magnitude(){ return sqrtf(std::pow(xy[0],2) + std::pow(xy[1],2)); }
 
+    float dot(Vec2 v) const {return (xy[0] * v.xy[0]) + (xy[1] * v.xy[1]);}
+
     //! Add two vectors together
     const Vec2 operator+(const Vec2& v) const 
     { 
@@ -36,6 +38,9 @@ public:
     const Vec2 operator*        (const float v) const
     { return Vec2(xy[0]*v, xy[1]*v); }
 
+    //! Division of a vector with a constant
+    const Vec2 operator/        (const float v) const
+    { return Vec2(xy[0]/v, xy[1]/v); }
 
     const float& operator[] (const int v) const { return xy[v]; }
     float& operator[] (const int v)       { return xy[v]; }

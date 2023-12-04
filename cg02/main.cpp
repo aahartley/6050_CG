@@ -73,7 +73,7 @@ char modeTag[MAX_DRAW_MODE+1][256] = { "None",
 /***************************************************************************/
 // Forward declarations
 
-void drawPixel(int x, int y);
+void drawPixel(float x, float y);
 void drawDot(int x, int y, int width);
 
 void drawCircle(int centerX, int centerY, int pointOnCricleX, int pointOnCricleY);
@@ -164,17 +164,17 @@ void initWindow()
 {
     glClearColor(0.0,0.0,0.0,0.0);
 	glShadeModel(GL_SMOOTH);
-    glOrtho(0,WIDTH,0,HEIGHT,-1.0,1.0);
+    glOrtho(-2,2,-2,2,-1.0,1.0);
 }
 
 /***************************************************************************/
 // draws one single pixel
-void drawPixel(int x, int y)
+void drawPixel(float x, float y)
 /* Turn on the pixel found at x,y */
 {
         glColor3f (1.0, 1.0, 1.0);                 
         glBegin(GL_POINTS);
-           glVertex3i( x, y, 0);
+           glVertex3f( x, y, 0);
         glEnd();	
 }
 

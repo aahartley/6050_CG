@@ -16,7 +16,7 @@
 #include <climits>
 /***************************************************************************/
 // Forward declarations
-void drawPixel(int x, int y);
+void drawPixel(float x, float y);
 
 // Main tasks for 4050
 void drawCircle(int centerX, int centerY, int pointOnCricleX, int pointOnCricleY);
@@ -334,25 +334,66 @@ void drawPoly(int ptX1, int ptY1, int ptX2, int ptY2)
 
 void drawQuinticBezier(int* ptX, int* ptY) {
 
-	float t=0;
-	int x = ptX[0];
-	int y = ptY[0];
-	drawPixel(ptX[0], ptY[0]);
-	while(t<=1.0f)
+	// float t=0;
+	// int x = ptX[0];
+	// int y = ptY[0];
+	// drawPixel(ptX[0], ptY[0]);
+	// while(t<=1.0f)
+	// {
+	// 	t+=0.0001f;
+	// 	float b0 = std::pow((1 - t),5);
+    // 	float b1 = 5 * t * std::pow((1 - t),4);
+    // 	float b2 = 10 * std::pow(t,2) * std::pow((1 - t),3);
+    // 	float b3 = 10 * std::pow(t,3) * std::pow((1 - t),2);
+    // 	float b4 = 5 * std::pow(t,4) * (1 - t);
+    // 	float b5 = std::pow(t,5);
+	// 	x=b0 * ptX[0] + b1 * ptX[1] + b2 * ptX[2] + b3 * ptX[3] + b4 * ptX[4] + b5 *ptX[5];
+	// 	y =b0 * ptY[0] + b1 * ptY[1] + b2 * ptY[2] + b3 * ptY[3] + b4 * ptY[4] + b5 *ptY[5];
+	// 	drawPixel(x, y);
+
+	// }
+	float rmin = 0;
+	float ymin = 0;
+	float ymax = 1;
+	float rmax = 1;
+	// std::vector<std::pair<float,float>> ctrl_points =  {{ymin + 0.1, rmin}, {0.2 * (ymax - ymin) + ymin, rmax},
+    //  								 {0.4 * (ymax - ymin) + ymin - 0.1, 0.5 * (rmax - rmin) + rmin},
+    //   								 {0.6 * (ymax - ymin) + ymin + 0.1, 0.5 * (rmax - rmin) + rmin},
+    //   								 {0.8 * (ymax - ymin) + ymin, rmax},
+    //   								 {ymax - 0.1, rmin}};
+	std::vector<std::pair<float,float>> ctrl_points =  {{0,0.1}, {0.4,0.2},
+     								 {0.5, 0.5},
+      								 {0.1,0.7},
+      								 {0.0,0.8},
+      								 {0.1,0.99}};									 
+									//  std::vector<std::pair<float, float>> ctrl_points = {{0.2 * (ymax - ymin) + ymin, rmax},
+                                    //                 {0.3 * (ymax - ymin) + ymin, 0.7 * (rmax - rmin) + rmin},
+                                    //                 {0.5 * (ymax - ymin) + ymin, 0.5 * (rmax - rmin) + rmin},
+                                    //                 {0.7 * (ymax - ymin) + ymin, 0.3 * (rmax - rmin) + rmin},
+                                    //                 {0.8 * (ymax - ymin) + ymin, rmax}};
+	float t = 0.0;
+	int i = 0;
+	//drawPixel(ctrl_points[0].first ,ctrl_points[0].second );
+	while(t <= 0.5f)
 	{
-		t+=0.001f;
-		float b0 = std::pow((1 - t),5);
-    	float b1 = 5 * t * std::pow((1 - t),4);
-    	float b2 = 10 * std::pow(t,2) * std::pow((1 - t),3);
-    	float b3 = 10 * std::pow(t,3) * std::pow((1 - t),2);
-    	float b4 = 5 * std::pow(t,4) * (1 - t);
-    	float b5 = std::pow(t,5);
-		x=b0 * ptX[0] + b1 * ptX[1] + b2 * ptX[2] + b3 * ptX[3] + b4 * ptX[4] + b5 *ptX[5];
-		y =b0 * ptY[0] + b1 * ptY[1] + b2 * ptY[2] + b3 * ptY[3] + b4 * ptY[4] + b5 *ptY[5];
-		drawPixel(x, y);
+		t += 0.001;
+		float b0 = ((1-t) * (1-t) * (1-t) * (1-t) * (1-t));
+    	float b1 = 5 * t * ((1-t) * (1-t) * (1-t) * (1-t));
+    	float b2 = 10 * (t*t) * ((1-t) * (1-t) * (1-t));
+    	float b3 = 10 * (t*t*t) * ((1-t) * (1-t));
+    	float b4 = 5 * (t*t*t*t) * (1 - t);
+    	float b5 = (t*t*t*t*t);
+		float x = b0 * ctrl_points[0].first + b1 * ctrl_points[1].first + b2 * ctrl_points[2].first + b3 * ctrl_points[3].first + b4 * ctrl_points[4].first + b5 *ctrl_points[5].first;
+		float y = b0 * ctrl_points[0].second + b1 * ctrl_points[1].second + b2 * ctrl_points[2].second + b3 * ctrl_points[3].second + b4 * ctrl_points[4].second + b5 *ctrl_points[5].second;
+		i++;
+		//std::cout << ctrl_points[0].first << ' ' << ctrl_points[1].first << ' ' << ctrl_points[2].first << ' ' << ctrl_points[3].first << ' ' << ctrl_points[4].first << ' ' << ctrl_points[5].first << '\n';
+		//std::cout << x << ' ' << y << '\n';
+		//std::cout << ctrl_points[0].second << ' ' << ctrl_points[1].second << ' ' << ctrl_points[2].second << ' ' << ctrl_points[3].second << ' ' << ctrl_points[4].second << ' ' << ctrl_points[5].second << '\n';
+
+	 	drawPixel(x, y);
 
 	}
-	
+
 
 }
 

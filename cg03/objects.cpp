@@ -67,48 +67,65 @@ inline void drawSphere(float r, int slices, int stacks)
 }
 
 
-inline void drawCube()
+inline void drawCube(float size)
 {
 	//local coords in [-1,1]
 	glBegin(GL_QUADS);               
-	// CCW 
 	glColor3f(0.0f, 1.0f, 0.0f);     // Green
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(size, size, -size);
+	glVertex3f(-size, size, -size);
+	glVertex3f(-size, size, size);
+	glVertex3f(size, size, size);
 
 	glColor3f(0.7f, 0.3f, 0.3f);     // Orangey
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
+	glVertex3f(size, -size, size);
+	glVertex3f(-size, -size, size);
+	glVertex3f(-size, -size, -size);
+	glVertex3f(size, -size, -size);
 
 	glColor3f(1.0f, 1.0f, 0.0f);     // Yellow
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
+	glVertex3f(size, -size, -size);
+	glVertex3f(-size, -size, -size);
+	glVertex3f(-size, size, -size);
+	glVertex3f(size, size, -size);
 
 	glColor3f(0.0f, 0.0f, 1.0f);     // Blue
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(-size, size, size);
+	glVertex3f(-size, size, -size);
+	glVertex3f(-size, -size, -size);
+	glVertex3f(-size, -size, size);
 
-	glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
+	glColor3f(1.0f, 0.0f, 1.0f);     // Pink
+	glVertex3f(size, size, -size);
+	glVertex3f(size, size, size);
+	glVertex3f(size, -size, size);
+	glVertex3f(size, -size, -size);
 
 	glColor3f(0.4f, 0.0f, 0.0f);     // Red
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(size, size, size);
+	glVertex3f(-size, size, size);
+	glVertex3f(-size, -size, size);
+	glVertex3f(size, -size, size);
 	glEnd();  
 	
 }
 
+inline void drawTorus(int segments, int circumference) //shape of torus, # of points to approximate(smoothness)
+{
+   double twopi = 2 * PI;
+   for (int i = 0; i < segments; i++) {
+      glBegin(GL_QUAD_STRIP);
+      for (int j = 0; j <= circumference; j++) {
+         for (int k = 1; k >= 0; k--) {
+            double s = (i + k) % segments + 0.5;
+            double t = j % circumference;
 
+            double x = (1+.1*cos(s*twopi/segments))*cos(t*twopi/circumference);
+            double y = (1+.1*cos(s*twopi/segments))*sin(t*twopi/circumference);
+            double z = .1 * sin(s * twopi / segments);
+            glVertex3f(x, y, z);
+         }
+      }
+      glEnd();
+   }
+}

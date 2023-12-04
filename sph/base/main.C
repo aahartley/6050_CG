@@ -10,7 +10,7 @@ using namespace window;
 int main( int argc, char** argv )
 {
    Window* window = CreateWindow();
-   SPHSolver solver(1, 5.0f);
+   SPHSolver solver(324, 0.0750f);
    window->SetSolver(&solver);
    //solver.PerformSimulation();
    std::vector<std::string> args;
