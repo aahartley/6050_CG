@@ -79,7 +79,7 @@ int main (int argc, char *argv[]) {
 	glfwSetKeyCallback(g_window, keyboardFunction);
 
 /*------------------------------CREATE GEOMETRY-------------------------------*/
-	loadSurfaceOfRevolution(100, 100);
+	loadSurfaceOfRevolution(50, 100);
 
 /*-------------------------------CREATE SHADERS-------------------------------*/
     // The vertex shader program generally acts to transform vertices.
@@ -169,7 +169,7 @@ int main (int argc, char *argv[]) {
 		
 		// The following function will actually draw your previously dispatched/loaded Surface of Revolution
 		// YOU HAVE TO IMPLEMENT THIS FUNCTION IN stub.cpp	
-		drawSurfaceOfRevolution(100, 100);
+		drawSurfaceOfRevolution(50, 100);
 
 		// update other events like input handling 
 		glfwPollEvents ();

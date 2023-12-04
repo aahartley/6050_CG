@@ -63,7 +63,7 @@ void loadQuinticBezierBaseCurve(std::vector<vec2>& curve, float ymin, float ymax
     //   								 vec2{0.6 * (ymax - ymin) + ymin + 0.1, 0.5 * (rmax - rmin) + rmin},
     //   								 vec2{0.8 * (ymax - ymin) + ymin, rmax},
     //   								 vec2{ymax - 0.1, rmin}};
-	std::vector<vec2> ctrl_points =  {vec2{0,0.1}, vec2{0.4,0.2},
+	std::vector<vec2> ctrl_points =  {vec2{0,0.2}, vec2{0.4,0.2},
      								 vec2{0.5, 0.5},
       								 vec2{0.1,0.7},
       								 vec2{0.0,0.8},
@@ -197,7 +197,7 @@ void loadSurfaceOfRevolution(int y_max, int theta_max)
 	GLuint points_vbo;
 	glGenBuffers(1, &points_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-	glBufferData(GL_ARRAY_BUFFER, size * sizeof (GLfloat), vp2, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size * sizeof (GLfloat), vp1, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
