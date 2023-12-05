@@ -32,6 +32,17 @@ mat4 model_mat;
 
 int pointCount;
 
+struct Quad
+{
+	Quad(){}
+	std::vector<vec3> v(4);
+};
+
+struct Triangle
+{
+	Triangle(){}
+	std::vector<vec3> v(3);
+};
 // void drawQuinticBezier(int* ptX, int* ptY) {
 
 // 	float t=0;
@@ -95,8 +106,6 @@ void loadSurfaceOfRevolution(int y_max, int theta_max)
 	int size = y_max * theta_max * 3;
 	/*------------------------------CREATE GEOMETRY-------------------------------*/
 	GLfloat* vp1 = new GLfloat[y_max*theta_max*3];    // array of vertex points
-	GLfloat* vp2 = new GLfloat[y_max*theta_max*3*4];    // array of vertex points
-	GLfloat* vp3 = new GLfloat[y_max*theta_max*3*3];    // array of vertex points
 
 	std::vector<vec2> curve(y_max);
 	std::vector<vec3> surface(y_max * theta_max);
@@ -122,36 +131,75 @@ void loadSurfaceOfRevolution(int y_max, int theta_max)
 
 	}
 	//(((j+1)+(i*100))*3)
-	for(int i = 0; i < y_max; i+=4)//row
+	std::vector<Quad> quads(y_max*theta_max);
+	int count = 0;
+	for(int i = 0; i < y_max; i++)//row
 	{
-		for(int j = 0; j < theta_max; j+=4)//col
+		for(int j = 0; j < theta_max; j++)//col
 		{
-			//0
-			vp2[((j+(i*100))*3)] = vp1[((j+(i*100))*3)];
-			vp2[((j+(i*100))*3)+1] = vp1[((j+(i*100))*3)+1];
-			vp2[((j+(i*100))*3)+2] = vp1[((j+(i*100))*3)+2];
-
-			//1
-			vp2[(((j)+(i*100))*3)+3] = vp1[(((j+1)+(i*100))*3)];
-			vp2[(((j)+(i*100))*3)+4] = vp1[((j+(i*100))*3)+1];
-			vp2[(((j)+(i*100))*3)+5] = vp1[((j+(i*100))*3)+2];
-
-			//2
-			vp2[(((j)+((i)*100))*3)+6] = vp1[(((j+1)+((i+1)*100))*3)];
-			vp2[(((j)+((i)*100))*3)+7] = vp1[((j+((i+1)*100))*3)+1];
-			vp2[(((j)+((i)*100))*3)+8] = vp1[((j+((i+1)*100))*3)+2];
-
-			//3
-			vp2[((j+(i*100))*3)+9] = vp1[((j+((i+1)*100))*3)];
-			vp2[((j+(i*100))*3)+10] = vp1[((j+((i+1)*100))*3)+1];
-			vp2[((j+(i*100))*3)+11] = vp1[((j+((i+1)*100))*3)+2];
+			if(i != y_max-1 && j != theta_max-1)
+			{
+			Quad q; 
+			q.v[0] = surface[((j+(i*100))*3)];
+			q.v[1] = surface[(((j+1)+(i*100))*3)];
+			q.v[2] = surface[(((j+1)+((i+1)*100))*3)];
+			q.v[3] = surface[(((j)+((i+1)*100))*3)];
+			quads[i*theta_max + j] = q;
+			count++;
+			}
 		}
 	}
-	
+	std::cout << count << ' ' << y_max*theta_max<<'\n';
+	size = y_max*theta_max*2*3;
+	std::vector<Triangle> tris(y_max*theta_max*2);
+	int index = 0;
+	for(int i = 0; i < quads.size(); i++)
+	{
+		Triangle t;
+		t.v[0] = quads[i].v[0];
+		t.v[1]= quads[i].v[1];
+		t.v[2]= quads[i].v[3];
+		tris[index] = t;
+		index++;
+		Triangle t2;
+		t2.v[0] = quads[i].v[3];
+		t2.v[1]= quads[i].v[1];
+		t2.v[2]= quads[i].v[2];
+		tris[index] = t;
+		index++;
+
+	}
+	GLfloat* vp2 = new GLfloat[tris.size()*3];    // array of vertex points
+
+	for(int i = 0; i < tris.size(); i++)
+	{
+		vp2[(i*3)] = tris[i].v[0].v[0];
+		vp2[(i*3)+1] = tris[i].v[0].v[1];
+		vp2[(i*3)+2] = tris[i].v[0].v[2];
+
+	}
 
 
 
+			// //0
+			// vp2[((j+(i*100))*3)] = vp1[((j+(i*100))*3)];
+			// vp2[((j+(i*100))*3)+1] = vp1[((j+(i*100))*3)+1];
+			// vp2[((j+(i*100))*3)+2] = vp1[((j+(i*100))*3)+2];
 
+			// //1
+			// vp2[(((j)+(i*100))*3)+3] = vp1[(((j+1)+(i*100))*3)];
+			// vp2[(((j)+(i*100))*3)+4] = vp1[((j+(i*100))*3)+1];
+			// vp2[(((j)+(i*100))*3)+5] = vp1[((j+(i*100))*3)+2];
+
+			// //2
+			// vp2[(((j)+((i)*100))*3)+6] = vp1[(((j+1)+((i+1)*100))*3)];
+			// vp2[(((j)+((i)*100))*3)+7] = vp1[((j+((i+1)*100))*3)+1];
+			// vp2[(((j)+((i)*100))*3)+8] = vp1[((j+((i+1)*100))*3)+2];
+
+			// //3
+			// vp2[((j+(i*100))*3)+9] = vp1[((j+((i+1)*100))*3)];
+			// vp2[((j+(i*100))*3)+10] = vp1[((j+((i+1)*100))*3)+1];
+			// vp2[((j+(i*100))*3)+11] = vp1[((j+((i+1)*100))*3)+2];
 
 
 
@@ -197,7 +245,8 @@ void loadSurfaceOfRevolution(int y_max, int theta_max)
 	GLuint points_vbo;
 	glGenBuffers(1, &points_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-	glBufferData(GL_ARRAY_BUFFER, size * sizeof (GLfloat), vp1, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, 18 * sizeof (GLfloat), vp, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size * sizeof (GLfloat), vp2, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
@@ -232,7 +281,9 @@ void loadUniforms(GLuint shader_programme)
 void drawSurfaceOfRevolution(int y_max, int theta_max)
 {
 	// MODIFY THIS LINE OF CODE APPRORIATELY FOR YOUR SURFACE OF REVOLUTION
-	glDrawArrays(GL_POINTS, 0, y_max * theta_max * 3);
+	glDrawArrays(GL_POINTS, 0, y_max * theta_max*2); //#of verts
+	//glDrawArrays(GL_POINTS, 0, 6);
+
 }
 	
 void keyboardFunction(GLFWwindow* window, int key, int scancode, int action, int mods)
