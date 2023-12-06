@@ -118,9 +118,11 @@ void print (const vec4& v);
 void print (const mat3& m);
 void print (const mat4& m);
 // vector functions
+float length (const vec2& v);
 float length (const vec3& v);
 float length2 (const vec3& v);
 vec3 normalise (const vec3& v);
+vec2 normalise (const vec2& v);
 float dot (const vec3& a, const vec3& b);
 vec3 cross (const vec3& a, const vec3& b);
 float get_squared_dist (vec3 from, vec3 to);

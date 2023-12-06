@@ -142,7 +142,9 @@ void print (const mat4& m) {
 float length (const vec3& v) {
 	return sqrt (v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2]);
 }
-
+float length (const vec2& v) {
+	return sqrt (v.v[0] * v.v[0] + v.v[1] * v.v[1] );
+}
 // squared length
 float length2 (const vec3& v) {
 	return v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2];
@@ -158,6 +160,18 @@ vec3 normalise (const vec3& v) {
 	vb.v[0] = v.v[0] / l;
 	vb.v[1] = v.v[1] / l;
 	vb.v[2] = v.v[2] / l;
+	return vb;
+}
+
+// note: proper spelling (hehe)
+vec2 normalise (const vec2& v) {
+	vec2 vb;
+	float l = length (v);
+	if (0.0f == l) {
+		return vec2 (0.0f, 0.0f);
+	}
+	vb.v[0] = v.v[0] / l;
+	vb.v[1] = v.v[1] / l;
 	return vb;
 }
 

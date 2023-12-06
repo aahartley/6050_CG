@@ -33,42 +33,27 @@ vec3 light_pos;
 vec3 light_color;
 vec3 object_color;
 
-struct Vertex3
-{
-	Vertex3(){}
-	vec3 v;
-	int index;
-};
 struct Quad
 {
 	Quad(){}
-	std::vector<Vertex3> v = std::vector<Vertex3>(4);
+	std::vector<vec3> v = std::vector<vec3>(4);
 };
 
 struct Triangle
 {
 	Triangle(){}
-	std::vector<Vertex3> v = std::vector<Vertex3>(3);
-	vec3 normal;
-
+	std::vector<vec3> v = std::vector<vec3>(3);
 };
-
-void calculateVertexNormals(std::vector<Triangle>& tris, std::vector<vec3>& v_normals)
+void calculateTriangleNormal(std::vector<vec3>& tri_normals, std::vector<Triangle>& tris)
 {
-	for(int i = 0; i < tris.size(); i++) 
+	for(int i = 0; i < tris.size(); i++)
 	{
-		vec3 e0 = tris[i].v[1].v - tris[i].v[0].v;
-		vec3 e1 = tris[i].v[2].v - tris[i].v[0].v;
+		vec3 e0 = tris[i].v[1] - tris[i].v[0];
+		vec3 e1 = tris[i].v[2] - tris[i].v[0];
 		vec3 normal = cross(e0, e1);
 		normal = normalise(normal);
+		tri_normals[i] = normal;
 
-		v_normals[tris[i].v[0].index] += normal;
-		v_normals[tris[i].v[1].index] += normal;
-		v_normals[tris[i].v[2].index] += normal;
-	}
-	for(int i = 0; i < v_normals.size(); i++)
-	{
-		v_normals[i] = normalise(v_normals[i]);
 	}
 }
 
@@ -94,9 +79,10 @@ void calculateTextureCoords(std::vector<vec2>& tex_coords, std::vector<vec3>& su
 	}
 }
 
-void loadQuinticBezierBaseCurve(std::vector<vec2>& curve, int num_step)
+
+void loadQuinticBezierBaseCurve(std::vector<vec2>& curve, float ymin, float ymax, float rmin, float rmax, int num_step)
 {
-	std::vector<vec2> ctrl_points =  {vec2{0,-.8}, vec2{0.3,-.6}, //sphere
+	std::vector<vec2> ctrl_points =  {vec2{0,-.8}, vec2{0.3,-.6},
      								 vec2{0.4, -.3},
       								 vec2{0.5,0},
       								 vec2{0.4,0.3},
@@ -119,7 +105,6 @@ void loadQuinticBezierBaseCurve(std::vector<vec2>& curve, int num_step)
 		float x = b0 * ctrl_points[0].v[0] + b1 * ctrl_points[1].v[0] + b2 * ctrl_points[2].v[0] + b3 * ctrl_points[3].v[0] + b4 * ctrl_points[4].v[0] + b5 *ctrl_points[5].v[0];
 		float y = b0 * ctrl_points[0].v[1] + b1 * ctrl_points[1].v[1] + b2 * ctrl_points[2].v[1] + b3 * ctrl_points[3].v[1] + b4 * ctrl_points[4].v[1] + b5 *ctrl_points[5].v[1];
 		vec2 v = {x,y};
-		//curve[i] = v;
 		curve[i] = normalise(v); //for sphere
 
 	}
@@ -134,23 +119,25 @@ void loadSurfaceOfRevolution(int y_max, int theta_max)
 	/*------------------------------CREATE GEOMETRY-------------------------------*/
 	std::vector<vec2> curve(y_max);
 	std::vector<vec3> surface(y_max * theta_max);
-	std::vector<vec3> v_normals(y_max*theta_max, vec3{0,0,0});
-	loadQuinticBezierBaseCurve(curve, y_max);
+	loadQuinticBezierBaseCurve(curve, 0, 1, 0, 1, y_max);
 	float theta;
-	for (int i = 0; i < curve.size(); i++)
+	for (int i = 0; i < curve.size(); ++i)
 	{
-  		for (int j = 0; j < theta_max; j++)
+  		for (int j = 0; j < theta_max; ++j)
 		{
-    		theta = (float)j / float(theta_max-1) * 360;
+    		theta = (float)j / float(theta_max - 1) * 360;
 
     		float x = curve[i].v[0] * std::cos(theta * ONE_DEG_IN_RAD);
     		float y = curve[i].v[1];
     		float z = curve[i].v[0] * std::sin(theta * ONE_DEG_IN_RAD);
 
     		surface[i * theta_max + j] = vec3{x, y, z};
-		}
+  		}
 	}
+
+
 	std::vector<Quad> quads(y_max*theta_max);
+	int count = 0;
 	for(int i = 0; i < y_max; i++)//row
 	{
 		for(int j = 0; j < theta_max; j++)//col
@@ -158,11 +145,12 @@ void loadSurfaceOfRevolution(int y_max, int theta_max)
 			if(i != y_max-1 && j != theta_max-1)
 			{
 				Quad q; 
-				q.v[0].v = surface[((j+(i*theta_max)))]; q.v[0].index = ((j+(i*theta_max)));
-				q.v[1].v = surface[(((j+1)+(i*theta_max)))]; q.v[1].index = (((j+1)+(i*theta_max)));
-				q.v[2].v = surface[(((j+1)+((i+1)*theta_max)))]; q.v[2].index = (((j+1)+((i+1)*theta_max)));
-				q.v[3].v = surface[(((j)+((i+1)*theta_max)))]; q.v[3].index = (((j)+((i+1)*theta_max)));
+				q.v[0] = surface[((j+(i*theta_max)))];
+				q.v[1] = surface[(((j+1)+(i*theta_max)))];
+				q.v[2] = surface[(((j+1)+((i+1)*theta_max)))];
+				q.v[3] = surface[(((j)+((i+1)*theta_max)))];
 				quads[i*theta_max + j] = q;
+				count++;
 			}
 		}
 	}
@@ -190,54 +178,50 @@ void loadSurfaceOfRevolution(int y_max, int theta_max)
 	for(int i = 0; i < tris.size(); i++)
 	{
 		//verts
-		vp[(i*9)  ] = tris[i].v[0].v.v[0];
-		vp[(i*9)+1] = tris[i].v[0].v.v[1];
-		vp[(i*9)+2] = tris[i].v[0].v.v[2];
+		vp[(i*9)  ] = tris[i].v[0].v[0];
+		vp[(i*9)+1] = tris[i].v[0].v[1];
+		vp[(i*9)+2] = tris[i].v[0].v[2];
 
 		//verts
-		vp[(i*9)+3] = tris[i].v[1].v.v[0];
-		vp[(i*9)+4] = tris[i].v[1].v.v[1];
-		vp[(i*9)+5] = tris[i].v[1].v.v[2];
+		vp[(i*9)+3] = tris[i].v[1].v[0];
+		vp[(i*9)+4] = tris[i].v[1].v[1];
+		vp[(i*9)+5] = tris[i].v[1].v[2];
 
 		//verts
-		vp[(i*9)+6] = tris[i].v[2].v.v[0];
-		vp[(i*9)+7] = tris[i].v[2].v.v[1];
-		vp[(i*9)+8] = tris[i].v[2].v.v[2];
+		vp[(i*9)+6] = tris[i].v[2].v[0];
+		vp[(i*9)+7] = tris[i].v[2].v[1];
+		vp[(i*9)+8] = tris[i].v[2].v[2];
 
 	}
-	calculateVertexNormals( tris, v_normals);
+	std::vector<vec3> tri_normals(y_max*theta_max*2);
+	calculateTriangleNormal(tri_normals, tris);
 	GLfloat* vn = new GLfloat[tris.size()*9]; // array of vertex normals
-	for(int i = 0; i < tris.size(); i++)
+	for(int i = 0; i < tri_normals.size(); i++)
 	{
 		//norms
-		vn[(i*9)  ] = v_normals[tris[i].v[0].index].v[0];
-		vn[(i*9)+1] = v_normals[tris[i].v[0].index].v[1];
-		vn[(i*9)+2] = v_normals[tris[i].v[0].index].v[2];
+		vn[(i*9)  ] = tri_normals[i].v[0];
+		vn[(i*9)+1] = tri_normals[i].v[1];
+		vn[(i*9)+2] = tri_normals[i].v[2];
+		//std::cout << tri_normals[i].v[2] << '\n';
+		//norms
+		vn[(i*9)+3] = tri_normals[i].v[0];
+		vn[(i*9)+4] = tri_normals[i].v[1];
+		vn[(i*9)+5] = tri_normals[i].v[2];
 
 		//norms
-		vn[(i*9)+3] = v_normals[tris[i].v[1].index].v[0];
-		vn[(i*9)+4] = v_normals[tris[i].v[1].index].v[1];
-		vn[(i*9)+5] = v_normals[tris[i].v[1].index].v[2];
-
-		//norms
-		vn[(i*9)+6] = v_normals[tris[i].v[2].index].v[0];
-		vn[(i*9)+7] = v_normals[tris[i].v[2].index].v[1];
-		vn[(i*9)+8] = v_normals[tris[i].v[2].index].v[2];
+		vn[(i*9)+6] = tri_normals[i].v[0];
+		vn[(i*9)+7] = tri_normals[i].v[1];
+		vn[(i*9)+8] = tri_normals[i].v[2];
 
 	}
-	std::vector<vec2> tex_coords(y_max * theta_max);
-	calculateTextureCoords(tex_coords, surface);
-	GLfloat* vt = new GLfloat[tris.size()*6]; //array of vertex tex
-	for(int i = 0; i < tris.size(); i++)
+	std::vector<vec2> tex_coords(tris.size()*3);
+	calculateTextureCoords(tex_coords, tris);
+	GLfloat* vt = new GLfloat[tex_coords.size()*2]; //array of vertex tex
+	for(int i = 0; i < tex_coords.size(); i++)
 	{
-		vt[(i*6)] = tex_coords[tris[i].v[0].index].v[0];
-		vt[(i*6)+1] = tex_coords[tris[i].v[0].index].v[1];
+		vt[(i*2)] = tex_coords[i].v[0];
+		vt[(i*2)+1] = tex_coords[i].v[1];
 
-		vt[(i*6)+2] = tex_coords[tris[i].v[1].index].v[0];
-		vt[(i*6)+3] = tex_coords[tris[i].v[1].index].v[1];
-
-		vt[(i*6)+4] = tex_coords[tris[i].v[2].index].v[0];
-		vt[(i*6)+5] = tex_coords[tris[i].v[2].index].v[1];
 	}
 	
 	// VAO -- vertex attribute objects bundle the various things associated with vertices

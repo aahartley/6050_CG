@@ -1,7 +1,7 @@
-GL_LOG_FILE log. local time Mon Dec  4 15:28:50 2023
+GL_LOG_FILE log. local time Wed Dec  6 03:49:32 2023
 
-starting GLFW 3.0.1 X11 GLX glXGetProcAddress clock_gettime /dev/jsrenderer: Mesa Intel(R) HD Graphics 630 (KBL GT2)
-version: 4.6 (Compatibility Profile) Mesa 21.2.6
+starting GLFW 3.0.1 X11 GLX glXGetProcAddress clock_gettime /dev/jsrenderer: llvmpipe (LLVM 15.0.7, 256 bits)
+version: 4.6 (Compatibility Profile) Mesa 23.2.1 - kisak-mesa PPA
 creating shader from vs.glsl...
 shader compiled. index 1
 creating shader from frag.glsl...

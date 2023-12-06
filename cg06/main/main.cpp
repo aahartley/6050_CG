@@ -11,6 +11,8 @@
 | Email: anton at antongerdelan dot net                                        |
 | Copyright Dr Anton Gerdelan, Trinity College Dublin, Ireland.                |
 |******************************************************************************/
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,7 +28,7 @@
 #include "gl_utils.h"      // Anton's opengl functions and small utilities like logs
 #include "obj_parser.h"    // Anton's little Wavefront .obj mesh loader
 
-#include "stb_image.h"     // Sean Barrett's image loader with Anton's load_texture()
+//#include "stb_image.h"     // Sean Barrett's image loader with Anton's load_texture()
 
 #define _USE_MATH_DEFINES
 #define ONE_DEG_IN_RAD (2.0 * M_PI) / 360.0 // 0.017444444
@@ -36,10 +38,11 @@
 extern mat4 view_mat;
 extern mat4 proj_mat;
 extern mat4 model_mat;
+extern vec3 cam_pos;
+extern vec3 light_pos;
+extern vec3 light_color;
+extern vec3 object_color;
 
-// the vector below indicates camra placement. 
-//It looks at (0,0,0) with (0,1,0) as the up-vector
-vec3 cam_pos (0.0f, 0.0f, 5.0f);
 
 // Below are the declarations for three functions from stub.cpp 
 void loadSurfaceOfRevolution(int y_max, int theta_max);
@@ -79,7 +82,7 @@ int main (int argc, char *argv[]) {
 	glfwSetKeyCallback(g_window, keyboardFunction);
 
 /*------------------------------CREATE GEOMETRY-------------------------------*/
-	loadSurfaceOfRevolution(50, 100);
+	loadSurfaceOfRevolution(100, 100);
 
 /*-------------------------------CREATE SHADERS-------------------------------*/
     // The vertex shader program generally acts to transform vertices.
@@ -108,9 +111,15 @@ int main (int argc, char *argv[]) {
 	else
 		assert (load_texture (argv[4], &tex01));
 
-	
-/*-------------------------------CREATE CAMERA--------------------------------*/
+/*-------------------------------CREATE LIGHTING--------------------------------*/
+	light_pos = vec3(0.0f, 0.0f, 5.0f);
+	light_color = vec3(1, 1, 1);
+	object_color = vec3(0.3, 0.2, 0.15);
 
+/*-------------------------------CREATE CAMERA--------------------------------*/
+	// the vector below indicates camra placement. 
+	//It looks at (0,0,0) with (0,1,0) as the up-vector
+	cam_pos = vec3(0.0f, 0.0f, 5.0f);
         // This sets up the matrix transformations that act as the camera lens
         // and sensor would to transform vertices from view space.
 	float near = 0.1f;   // clipping planes
@@ -159,7 +168,7 @@ int main (int argc, char *argv[]) {
 
 		// update and draw mesh, rotating the SoR 
 		// set a pace independent of outright rendering speed
-                double rotAmt = -60 * elapsed_seconds; 
+                double rotAmt = -60 * elapsed_seconds ; 
 		model_mat = rotate_y_deg(identity_mat4(), rotAmt) * model_mat;
 
 		// load uniform variables for shaders
@@ -169,7 +178,7 @@ int main (int argc, char *argv[]) {
 		
 		// The following function will actually draw your previously dispatched/loaded Surface of Revolution
 		// YOU HAVE TO IMPLEMENT THIS FUNCTION IN stub.cpp	
-		drawSurfaceOfRevolution(50, 100);
+		drawSurfaceOfRevolution(100, 100);
 
 		// update other events like input handling 
 		glfwPollEvents ();
@@ -190,6 +199,8 @@ int main (int argc, char *argv[]) {
 bool load_texture (const char* file_name, GLuint* tex) {
 	int x, y, n;
 	int force_channels = 4;
+stbi_set_flip_vertically_on_load(true);  
+
 	unsigned char* image_data = stbi_load (file_name, &x, &y, &n, force_channels);
 	if (!image_data) {
 		fprintf (stderr, "ERROR: could not load %s\n", file_name);
@@ -201,6 +212,7 @@ bool load_texture (const char* file_name, GLuint* tex) {
 			stderr, "WARNING: texture %s is not power-of-2 dimensions\n", file_name
 		);
 	}
+
 	int width_in_bytes = x * 4;
 	unsigned char *top = NULL;
 	unsigned char *bottom = NULL;
