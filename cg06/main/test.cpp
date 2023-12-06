@@ -57,28 +57,39 @@ void calculateTriangleNormal(std::vector<vec3>& tri_normals, std::vector<Triangl
 	}
 }
 
-void calculateTextureCoords(std::vector<vec2>& tex_coords, std::vector<vec3>& surface)
+void calculateTextureCoords(std::vector<vec2>& tex_coords, std::vector<Triangle>& tris)
 {
-	for(int i = 0; i < surface.size(); i++)
+	for(int i = 0; i < tris.size(); i++)
 	{
 		float r, theta, phi, normalizedTheta, normalizedPhi, u, v;
-		r = sqrt(surface[i].v[0] * surface[i].v[0] + surface[i].v[1] * surface[i].v[1] + surface[i].v[2] * surface[i].v[2]);
-		theta = atan2(surface[i].v[1], surface[i].v[0]);
-		phi = acos(surface[i].v[2] / r);
+		//prob coudlve just looped this xd
+		r = sqrt(tris[i].v[0].v[0] * tris[i].v[0].v[0] + tris[i].v[0].v[1] * tris[i].v[0].v[1] + tris[i].v[0].v[2] * tris[i].v[0].v[2]);
+		
+  		
+	 	v = acos(tris[i].v[0].v[1]/r)/M_PI;
+		u=(atan2(tris[i].v[0].v[2],tris[i].v[0].v[0])/M_PI+1)*0.5f;
+  		// Store the texture coordinates
+  		tex_coords[(i*3)] = vec2(u, v);
+		
 	
+		r = sqrt(tris[i].v[1].v[0] * tris[i].v[1].v[0] + tris[i].v[1].v[1] * tris[i].v[1].v[1] + tris[i].v[1].v[2] * tris[i].v[1].v[2]);
+		v = acos(tris[i].v[1].v[1]/r)/M_PI;
+		u=(atan2(tris[i].v[1].v[2],tris[i].v[1].v[0])/M_PI+1)*0.5f;
+		
+  		// Store the texture coordinates
+  		tex_coords[(i*3)+1] = vec2(u, v);
+		
 
-      // Regular spherical mapping
-       normalizedTheta = theta / (2.0f * M_PI);
-       normalizedPhi = phi / M_PI;
-      u = normalizedTheta;
-      v = 1.0f - normalizedPhi;
-	  u = acos(surface[i].v[1]/r)/M_PI;
-	  v=(atan2(surface[i].v[2],surface[i].v[0])/M_PI+1)*0.5f;
-      tex_coords[i] = vec2(v, u);
-    
+	
+		r = sqrt(tris[i].v[2].v[0] * tris[i].v[2].v[0] + tris[i].v[2].v[1] * tris[i].v[2].v[1] + tris[i].v[2].v[2] * tris[i].v[2].v[2]);
+		v = acos(tris[i].v[2].v[1]/r)/M_PI;
+		u=(atan2(tris[i].v[2].v[2],tris[i].v[2].v[0])/M_PI+1)*0.5f;
+		
+  		tex_coords[(i*3)+2] = vec2(u, v);
+		
+		
 	}
 }
-
 
 void loadQuinticBezierBaseCurve(std::vector<vec2>& curve, float ymin, float ymax, float rmin, float rmax, int num_step)
 {

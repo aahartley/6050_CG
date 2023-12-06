@@ -14,7 +14,6 @@
 #include <assert.h>
 #include <vector>
 #include <iostream>
-
 #include <math.h>
 #include <time.h>
 
@@ -76,20 +75,15 @@ void calculateTextureCoords(std::vector<vec2>& tex_coords, std::vector<vec3>& su
 {
 	for(int i = 0; i < surface.size(); i++)
 	{
-		float r, theta, phi, normalizedTheta, normalizedPhi, u, v;
+		float r, u, v;
 		r = sqrt(surface[i].v[0] * surface[i].v[0] + surface[i].v[1] * surface[i].v[1] + surface[i].v[2] * surface[i].v[2]);
-		theta = atan2(surface[i].v[1], surface[i].v[0]);
-		phi = acos(surface[i].v[2] / r);
-	
 
-      // Regular spherical mapping
-       normalizedTheta = theta / (2.0f * M_PI);
-       normalizedPhi = phi / M_PI;
-      u = normalizedTheta;
-      v = 1.0f - normalizedPhi;
-	  u = acos(surface[i].v[1]/r)/M_PI;
-	  v=(atan2(surface[i].v[2],surface[i].v[0])/M_PI+1)*0.5f;
-      tex_coords[i] = vec2(v, u);
+	 	v = acos(surface[i].v[1]/r)/M_PI;
+		u = (atan2(surface[i].v[2],surface[i].v[0])/M_PI+1)*0.5f;
+		if( u < 0) u =0; if(u>1) u =1; 
+		if( v < 0) v =0; if(v>1) v =1; 
+
+      	tex_coords[i] = vec2(u, v);
     
 	}
 }

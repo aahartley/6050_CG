@@ -71,51 +71,21 @@ void calculateVertexNormals(std::vector<Triangle>& tris, std::vector<vec3>& v_no
 		v_normals[i] = normalise(v_normals[i]);
 	}
 }
-void calculateTextureCoords(std::vector<vec2>& tex_coords, std::vector<vec3>& surface) {
-  for (int i = 0; i < surface.size(); i++) {
-    // Calculate spherical coordinates
-    float r = sqrt(surface[i].v[0] * surface[i].v[0] + surface[i].v[1] * surface[i].v[1] + surface[i].v[2] * surface[i].v[2]);
-    float theta = atan2(surface[i].v[1], surface[i].v[0]);
-    float phi = acos(surface[i].v[2] / r);
 
-    // Normalize spherical coordinates
-    float normalizedTheta = theta / (2.0f * M_PI);
-    float normalizedPhi = phi / M_PI;
+void calculateTextureCoords(std::vector<vec2>& tex_coords, std::vector<vec3>& surface)
+{
+	for(int i = 0; i < surface.size(); i++)
+	{
+		float r, u, v;
+		r = sqrt(surface[i].v[0] * surface[i].v[0] + surface[i].v[1] * surface[i].v[1] + surface[i].v[2] * surface[i].v[2]);
 
-    // Wrap texture coordinates along U dimension
-    float u = normalizedTheta;
-    u = fmod(u, 1.0f); // Wrap u to range [0, 1]
-
-    // Map normalized spherical coordinates to texture coordinates
-    float v = 1.0f - normalizedPhi;
-
-    tex_coords[i] = vec2(u, v);
-  }
+	 	v = acos(surface[i].v[1]/r)/M_PI;
+		u=(atan2(surface[i].v[2],surface[i].v[0])/M_PI+1)*0.5f;
+		
+      	tex_coords[i] = vec2(u, v);
+    
+	}
 }
-// void calculateTextureCoords(std::vector<vec2>& tex_coords, std::vector<vec3>& surface)
-// {
-// 	for(int i = 0; i < surface.size(); i++)
-// 	{
-// 		float r, theta, phi, normalizedTheta, normalizedPhi, u, v;
-// 		r = sqrt(surface[i].v[0] * surface[i].v[0] + surface[i].v[1] * surface[i].v[1] + surface[i].v[2] * surface[i].v[2]);
-// 		theta = atan2(surface[i].v[1], surface[i].v[0]);
-// 		phi = acos(surface[i].v[2] / r);
-	
-// // Handle pole cases
-//     if (phi == 0.0f) { // North pole
-//       tex_coords[i] = vec2(theta / (2.0f * M_PI), 1.0f);
-//     } else if (phi == M_PI) { // South pole
-//       tex_coords[i] = vec2(theta / (2.0f * M_PI), 0.0f);
-//     } else {
-//       // Regular spherical mapping
-//       float normalizedTheta = theta / (2.0f * M_PI);
-//       float normalizedPhi = phi / M_PI;
-//       u = normalizedTheta;
-//       v = 1.0f - normalizedPhi;
-//       tex_coords[i] = vec2(u, v);
-//     }
-// 	}
-// }
 
 void loadQuinticBezierBaseCurve(std::vector<vec2>& curve, int num_step)
 {
