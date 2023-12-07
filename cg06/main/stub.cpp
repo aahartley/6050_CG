@@ -318,7 +318,30 @@ void keyboardFunction(GLFWwindow* window, int key, int scancode, int action, int
 		printf("\nKey 'E' pressed.... \n");
         // Example case. Key 'E' pressed. Doing nothing
 	}
-        
+    if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    {
+		light_pos.v[1] += 1;
+	}
+	if (key == GLFW_KEY_S && action == GLFW_PRESS)
+    {
+		light_pos.v[1] -= 1;
+	}
+    if (key == GLFW_KEY_A && action == GLFW_PRESS)
+    {
+		light_pos.v[0] -= 1;
+	}
+	if (key == GLFW_KEY_D && action == GLFW_PRESS)
+    {
+		light_pos.v[0] += 1;
+	}
+	if (key == GLFW_KEY_E && action == GLFW_PRESS)
+    {
+		light_pos.v[2] += 1;
+	}
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+    {
+		light_pos.v[2] -= 1;
+	}
 	if (GLFW_PRESS == glfwGetKey (g_window, GLFW_KEY_ESCAPE)) {
 		// Close window when esacape is pressed
 			glfwSetWindowShouldClose (g_window, 1);

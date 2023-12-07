@@ -42,7 +42,7 @@ void main ()
     //normal phong
     //vec3 reflect_dir = reflect(-light_dir, norm);
     //float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 8);
-    //vec3 specular =  specularStrength * spec * vec3(0.3); 
+    //vec3 specular =  specularStrength * spec * vec3(1); 
 
     vec3 result = (ambient + diffuse + specular) ;
     fragment_color = vec4(result, 1.0);
