@@ -31,6 +31,10 @@ vec3 cam_pos;
 vec3 light_pos;
 vec3 light_color;
 vec3 object_color;
+int specular_exp;
+bool diffuse = true;
+bool specular = true;
+bool albedo = true;
 
 struct Vertex3
 {
@@ -60,10 +64,20 @@ void calculateVertexNormals(std::vector<Triangle>& tris, std::vector<vec3>& v_no
 		vec3 e1 = tris[i].v[2].v - tris[i].v[0].v;
 		vec3 normal = cross(e0, e1);
 		normal = normalise(normal);
-
-		v_normals[tris[i].v[0].index] += normal;
-		v_normals[tris[i].v[1].index] += normal;
-		v_normals[tris[i].v[2].index] += normal;
+		tris[i].normal = normal;
+	}
+	for(int i = 0; i < v_normals.size(); i++)
+	{
+		int count = 0;
+		for(int j = 0; j < tris.size(); j++)
+		{
+			if(tris[j].v[0].index == i || tris[j].v[1].index == i || tris[j].v[2].index == i )
+			{
+				v_normals[i] += tris[j].normal;
+				count++;
+			}
+		}
+		if(count!=0) v_normals[i] = normalise(v_normals[i]/count);
 	}
 	for(int i = 0; i < v_normals.size(); i++)
 	{
@@ -287,6 +301,11 @@ void loadUniforms(GLuint shader_programme)
 	int light_pos_location = glGetUniformLocation(shader_programme, "light_pos");
 	int light_color_location = glGetUniformLocation(shader_programme, "light_color");
 	int object_color_location = glGetUniformLocation(shader_programme, "object_color");
+	int specular_exp_location = glGetUniformLocation(shader_programme, "specular_exp");
+	int diffuse_location = glGetUniformLocation(shader_programme, "diffuseB");
+	int specular_location = glGetUniformLocation(shader_programme, "specularB");
+	int albedo_location = glGetUniformLocation(shader_programme, "albedoB");
+
 
 	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view_mat.m);
 	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, proj_mat.m);
@@ -295,6 +314,10 @@ void loadUniforms(GLuint shader_programme)
 	glUniform3fv (light_pos_location, 1, light_pos.v);
 	glUniform3fv (light_color_location, 1, light_color.v);
 	glUniform3fv (object_color_location, 1, object_color.v);
+	glUniform1i(specular_exp_location, specular_exp);
+	glUniform1i(diffuse_location ,diffuse);
+	glUniform1i(specular_location, specular);
+	glUniform1i(albedo_location, albedo);
 
 	// WRITE CODE TO LOAD OTHER UNIFORM VARIABLES LIKE FLAGS FOR ENABLING OR DISABLING CERTAIN FUNCTIONALITIES
 }
@@ -313,11 +336,6 @@ void keyboardFunction(GLFWwindow* window, int key, int scancode, int action, int
 	// Callback Example: https://www.glfw.org/docs/3.3/input_guide.html#input_key
 	// List of Keys: https://www.glfw.org/docs/3.3/group__keys.html
 	
-    if (key == GLFW_KEY_E && action == GLFW_PRESS)
-    {
-		printf("\nKey 'E' pressed.... \n");
-        // Example case. Key 'E' pressed. Doing nothing
-	}
     if (key == GLFW_KEY_W && action == GLFW_PRESS)
     {
 		light_pos.v[1] += 1;
@@ -341,6 +359,47 @@ void keyboardFunction(GLFWwindow* window, int key, int scancode, int action, int
 	if (key == GLFW_KEY_Q && action == GLFW_PRESS)
     {
 		light_pos.v[2] -= 1;
+	}
+	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+    {
+		light_pos = vec3(0,0,5);
+		specular_exp = 48;
+	}
+	if (key == GLFW_KEY_N && action == GLFW_PRESS)
+    {
+		specular_exp -= 2;
+	}
+	if (key == GLFW_KEY_M && action == GLFW_PRESS)
+    {
+		specular_exp += 2;
+	}
+	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+    {
+		if(diffuse)
+			diffuse = false;
+		else
+			diffuse = true;
+	}
+	if (key == GLFW_KEY_X && action == GLFW_PRESS)
+    {
+		if(specular)
+			specular = false;
+		else
+			specular = true;
+	}
+	if (key == GLFW_KEY_C && action == GLFW_PRESS)
+    {
+		if(albedo)
+		{
+			albedo = false;
+			light_color = vec3(1,1,1);
+
+		}
+		else
+		{
+			albedo = true;
+			light_color = vec3(0.3,0.3,0.3);
+		}
 	}
 	if (GLFW_PRESS == glfwGetKey (g_window, GLFW_KEY_ESCAPE)) {
 		// Close window when esacape is pressed

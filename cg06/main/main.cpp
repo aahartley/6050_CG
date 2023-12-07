@@ -42,6 +42,7 @@ extern vec3 cam_pos;
 extern vec3 light_pos;
 extern vec3 light_color;
 extern vec3 object_color;
+extern int specular_exp;
 
 
 // Below are the declarations for three functions from stub.cpp 
@@ -113,9 +114,9 @@ int main (int argc, char *argv[]) {
 
 /*-------------------------------CREATE LIGHTING--------------------------------*/
 	light_pos = vec3(0.0f, 0.0f, 5.0f);
-	light_color = vec3(1, 1, 1);
+	light_color = vec3(0.3, 0.3, 0.3);
 	object_color = vec3(0.3, 0.2, 0.15);
-
+	specular_exp = 48;
 /*-------------------------------CREATE CAMERA--------------------------------*/
 	// the vector below indicates camra placement. 
 	//It looks at (0,0,0) with (0,1,0) as the up-vector
